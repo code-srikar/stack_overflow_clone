@@ -24,6 +24,35 @@ app.get('/', (req, res) => {
     res.send("Codequest is running perfect")
 })
 
+app.post('/send-otp', async (req, res) => {
+    const { email, otp } = req.body;
+
+    // Set up nodemailer transport
+    let transporter = nodemailer.createTransport({
+        service: 'your-email-service-provider', // e.g., 'gmail'
+        auth: {
+            user: 'your-email@example.com',
+            pass: 'your-email-password',
+        },
+    });
+
+    // Define email options
+    let mailOptions = {
+        from: 'your-email@example.com',
+        to: email,
+        subject: 'Your OTP Code',
+        text: `Your OTP is: ${otp}`,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        res.status(200).send({ message: 'OTP sent successfully' });
+    } catch (error) {
+        console.error('Error sending OTP:', error);
+        res.status(500).send({ message: 'Failed to send OTP', error });
+    }
+});
+
 const PORT = process.env.PORT || 5000
 const database_url = process.env.MONGODB_URL
 
